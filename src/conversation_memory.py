@@ -465,7 +465,8 @@ class ConversationMemory:
                     "message_count": message_count
                 })
             
-            return sessions    def clear_session(self, session_id: str) -> bool:
+            return sessions    
+    def clear_session(self, session_id: str) -> bool:
         """
         Mark a session as inactive (clear/disable it).
         
