@@ -32,9 +32,11 @@ Version: 1.0.0
 import sqlite3
 import json
 import uuid
+import time
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
+from contextlib import contextmanager
 import logging
 
 logger = logging.getLogger(__name__)
@@ -106,45 +108,95 @@ class ConversationMemory:
                           Will be created if it doesn't exist.
         """
         self.db_path = db_path
+        self.max_retries = 3
+        self.retry_delay = 0.1  # 100ms
         self._init_database()
+    
+    @contextmanager
+    def _get_db_connection(self):
+        """
+        Context manager for database connections with proper error handling and timeouts.
+        
+        Yields:
+            tuple: (connection, cursor) ready for database operations
+        """
+        conn = None
+        retries = 0
+        
+        while retries < self.max_retries:
+            try:
+                # Configure SQLite connection with timeout and optimizations
+                conn = sqlite3.connect(
+                    self.db_path, 
+                    timeout=30.0,  # 30 second timeout
+                    check_same_thread=False
+                )
+                
+                # Configure SQLite for better concurrency
+                conn.execute("PRAGMA journal_mode=WAL")  # Write-Ahead Logging
+                conn.execute("PRAGMA synchronous=NORMAL")  # Balance safety and performance
+                conn.execute("PRAGMA cache_size=10000")  # Increase cache
+                conn.execute("PRAGMA temp_store=MEMORY")  # Use memory for temp storage
+                conn.execute("PRAGMA busy_timeout=30000")  # 30 second busy timeout
+                
+                cursor = conn.cursor()
+                yield conn, cursor
+                break
+                
+            except sqlite3.OperationalError as e:
+                retries += 1
+                if "database is locked" in str(e).lower() and retries < self.max_retries:
+                    logger.warning(f"Database locked, retrying ({retries}/{self.max_retries}) after {self.retry_delay}s")
+                    time.sleep(self.retry_delay)
+                    self.retry_delay *= 2  # Exponential backoff
+                    continue
+                else:
+                    logger.error(f"Database error after {retries} retries: {e}")
+                    raise
+            except Exception as e:
+                logger.error(f"Unexpected database error: {e}")
+                raise
+            finally:
+                if conn:
+                    try:
+                        conn.close()
+                    except Exception as e:
+                        logger.error(f"Error closing database connection: {e}")
     
     def _init_database(self):
         """Initialize the SQLite database with required tables."""
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        # Create conversations table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS conversations (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                session_id TEXT NOT NULL,
-                timestamp TEXT NOT NULL,
-                role TEXT NOT NULL,
-                content TEXT NOT NULL,
-                ui_generated TEXT,
-                metadata TEXT,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        
-        # Create sessions table
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS sessions (
-                session_id TEXT PRIMARY KEY,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
-                message_count INTEGER DEFAULT 0,
-                context_summary TEXT,
-                is_active BOOLEAN DEFAULT 1
-            )
-        """)
-        
-        # Create indexes for better performance
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_session_timestamp ON conversations(session_id, timestamp)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_session_activity ON sessions(last_activity)")
-        
-        conn.commit()
-        conn.close()
+        with self._get_db_connection() as (conn, cursor):
+            # Create conversations table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS conversations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_id TEXT NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    role TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    ui_generated TEXT,
+                    metadata TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Create sessions table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS sessions (
+                    session_id TEXT PRIMARY KEY,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    last_activity DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    message_count INTEGER DEFAULT 0,
+                    context_summary TEXT,
+                    is_active BOOLEAN DEFAULT 1
+                )
+            """)
+            
+            # Create indexes for better performance
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_session_timestamp ON conversations(session_id, timestamp)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_session_activity ON sessions(last_activity)")
+            
+            conn.commit()
     
     def create_session(self) -> str:
         """
@@ -155,16 +207,13 @@ class ConversationMemory:
         """
         session_id = str(uuid.uuid4())
         
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-            INSERT INTO sessions (session_id, created_at, last_activity)
-            VALUES (?, ?, ?)
-        """, (session_id, datetime.now().isoformat(), datetime.now().isoformat()))
-        
-        conn.commit()
-        conn.close()
+        with self._get_db_connection() as (conn, cursor):
+            cursor.execute("""
+                INSERT INTO sessions (session_id, created_at, last_activity)
+                VALUES (?, ?, ?)
+            """, (session_id, datetime.now().isoformat(), datetime.now().isoformat()))
+            
+            conn.commit()
         
         logger.info(f"Created new conversation session: {session_id}")
         return session_id
@@ -182,31 +231,28 @@ class ConversationMemory:
             ui_generated (Optional[Dict]): UI JSON if this was a UI generation response
             metadata (Optional[Dict]): Additional metadata about the message
         """
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        # Add the message
-        cursor.execute("""
-            INSERT INTO conversations (session_id, timestamp, role, content, ui_generated, metadata)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (
-            session_id,
-            datetime.now().isoformat(),
-            role,
-            content,
-            json.dumps(ui_generated) if ui_generated else None,
-            json.dumps(metadata) if metadata else None
-        ))
-        
-        # Update session activity
-        cursor.execute("""
-            UPDATE sessions 
-            SET last_activity = ?, message_count = message_count + 1
-            WHERE session_id = ?
-        """, (datetime.now().isoformat(), session_id))
-        
-        conn.commit()
-        conn.close()
+        with self._get_db_connection() as (conn, cursor):
+            # Add the message
+            cursor.execute("""
+                INSERT INTO conversations (session_id, timestamp, role, content, ui_generated, metadata)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                session_id,
+                datetime.now().isoformat(),
+                role,
+                content,
+                json.dumps(ui_generated) if ui_generated else None,
+                json.dumps(metadata) if metadata else None
+            ))
+            
+            # Update session activity
+            cursor.execute("""
+                UPDATE sessions 
+                SET last_activity = ?, message_count = message_count + 1
+                WHERE session_id = ?
+            """, (datetime.now().isoformat(), session_id))
+            
+            conn.commit()
         
         logger.debug(f"Added {role} message to session {session_id}: {content[:100]}...")
     
@@ -221,19 +267,16 @@ class ConversationMemory:
         Returns:
             List[ConversationMessage]: List of conversation messages, ordered by timestamp
         """
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-            SELECT session_id, timestamp, role, content, ui_generated, metadata
-            FROM conversations
-            WHERE session_id = ?
-            ORDER BY timestamp DESC
-            LIMIT ?
-        """, (session_id, limit))
-        
-        rows = cursor.fetchall()
-        conn.close()
+        with self._get_db_connection() as (conn, cursor):
+            cursor.execute("""
+                SELECT session_id, timestamp, role, content, ui_generated, metadata
+                FROM conversations
+                WHERE session_id = ?
+                ORDER BY timestamp DESC
+                LIMIT ?
+            """, (session_id, limit))
+            
+            rows = cursor.fetchall()
         
         messages = []
         for row in rows:
