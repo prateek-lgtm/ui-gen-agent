@@ -1,0 +1,104 @@
+USER ACTIVITY DATA FOR VECTOR DATABASE
+
+=== WHATSAPP ACTIVITY DATA ===
+
+Date: 2025-10-14
+WhatsApp Activity Summary:
+- Active time: 85 minutes
+- Messages sent: 124
+- Messages received: 156
+- Media files shared: 12
+- Most active chat: Family Group
+- Peak usage hours: 12:00 PM and 8:00 PM
+- Chat distribution: 65% group chats, 35% personal chats
+- Daily engagement: High activity with frequent messaging
+
+Date: 2025-10-13
+WhatsApp Activity Summary:
+- Active time: 92 minutes
+- Messages sent: 138
+- Messages received: 167
+- Media files shared: 8
+- Most active chat: Work Team
+- Peak usage hours: 10:00 AM and 3:00 PM
+- Chat distribution: 75% group chats, 25% personal chats
+- Daily engagement: Very high activity with work-related communications
+
+WhatsApp Weekly Summary:
+- Total active time: 620 minutes (10.3 hours)
+- Total messages exchanged: 1850
+- Media shared: 45 files
+- Most active groups: Family Group, Work Team
+- Usage pattern: Consistent daily usage with peak activity during work hours and evenings
+
+=== YOUTUBE ACTIVITY DATA ===
+
+Date: 2025-10-14
+YouTube Activity Summary:
+- Watch time: 120 minutes (2 hours)
+- Videos watched: 8
+- Most watched category: Technology
+- Peak usage hour: 8:00 PM
+- Category breakdown: Technology (45 min), Education (35 min), Entertainment (40 min)
+- Viewing pattern: Evening entertainment with focus on tech content
+
+Date: 2025-10-13
+YouTube Activity Summary:
+- Watch time: 90 minutes (1.5 hours)
+- Videos watched: 6
+- Most watched category: Education
+- Peak usage hour: 7:00 PM
+- Category breakdown: Education (50 min), Technology (25 min), Entertainment (15 min)
+- Viewing pattern: Educational content focus with moderate usage
+
+YouTube Weekly Summary:
+- Total watch time: 840 minutes (14 hours)
+- Average daily time: 120 minutes
+- Favorite category: Technology
+- Total videos watched: 42
+- Usage pattern: Regular evening viewing with preference for technology and educational content
+
+=== BATTERY PERFORMANCE DATA ===
+
+Date: 2025-10-14
+Battery Performance Summary:
+- Charge cycles: 2 full cycles
+- Battery range: 100% to 15% (85% usage)
+- Screen on time: 5.2 hours
+- Top consuming apps: YouTube (25%), Instagram (20%), WhatsApp (15%), Chrome (10%)
+- Battery health: Good performance with typical usage patterns
+
+Date: 2025-10-13
+Battery Performance Summary:
+- Charge cycles: 1 full cycle
+- Battery range: 100% to 20% (80% usage)
+- Screen on time: 4.8 hours
+- Top consuming apps: YouTube (20%), WhatsApp (18%), Instagram (15%), Chrome (12%)
+- Battery health: Excellent performance with efficient usage
+
+Battery Weekly Summary:
+- Average charge cycles: 1.5 per day
+- Average screen time: 5.0 hours daily
+- Most consuming apps: YouTube, Instagram, WhatsApp
+- Battery health: Good overall performance with normal degradation patterns
+- Usage recommendation: Moderate to heavy usage with room for optimization
+
+=== USER BEHAVIOR PATTERNS ===
+
+Communication Patterns:
+- Heavy WhatsApp user with strong preference for group communications
+- Peak communication hours: 10AM-12PM and 3PM-8PM
+- Balanced between personal and professional messaging
+- High media sharing activity indicates rich communication style
+
+Entertainment Patterns:
+- Regular YouTube viewer with consistent daily consumption
+- Strong preference for educational and technology content
+- Evening viewing habits (7-8PM peak times)
+- Moderate to high engagement with longer viewing sessions
+
+Device Usage Patterns:
+- Moderate to heavy smartphone user (5+ hours screen time)
+- Balanced app usage across social, entertainment, and productivity
+- Typical charging behavior with 1-2 cycles per day
+- Good battery management with reasonable charge levels

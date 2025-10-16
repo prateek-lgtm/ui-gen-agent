@@ -1,0 +1,107 @@
+{
+    "youtube": {
+        "daily_usage": [
+            {
+                "date": "2025-10-14",
+                "watch_time_minutes": 120,
+                "videos_watched": 8,
+                "most_watched_category": "Technology",
+                "peak_usage_hour": "20:00",
+                "categories": {
+                    "Technology": 45,
+                    "Education": 35,
+                    "Entertainment": 40
+                }
+            },
+            {
+                "date": "2025-10-13",
+                "watch_time_minutes": 90,
+                "videos_watched": 6,
+                "most_watched_category": "Education",
+                "peak_usage_hour": "19:00",
+                "categories": {
+                    "Education": 50,
+                    "Technology": 25,
+                    "Entertainment": 15
+                }
+            }
+        ],
+        "weekly_summary": {
+            "total_watch_time": 840,
+            "average_daily_time": 120,
+            "favorite_category": "Technology",
+            "total_videos": 42
+        }
+    },
+    "whatsapp": {
+        "daily_usage": [
+            {
+                "date": "2025-10-14",
+                "active_time_minutes": 85,
+                "messages_sent": 124,
+                "messages_received": 156,
+                "media_shared": 12,
+                "most_active_chat": "Family Group",
+                "peak_hours": ["12:00", "20:00"],
+                "chat_categories": {
+                    "group_chats": 65,
+                    "personal_chats": 35
+                }
+            },
+            {
+                "date": "2025-10-13",
+                "active_time_minutes": 92,
+                "messages_sent": 138,
+                "messages_received": 167,
+                "media_shared": 8,
+                "most_active_chat": "Work Team",
+                "peak_hours": ["10:00", "15:00"],
+                "chat_categories": {
+                    "group_chats": 75,
+                    "personal_chats": 25
+                }
+            }
+        ],
+        "weekly_summary": {
+            "total_active_time": 620,
+            "total_messages": 1850,
+            "media_shared": 45,
+            "most_active_groups": ["Family Group", "Work Team"]
+        }
+    },
+    "battery": {
+        "daily_stats": [
+            {
+                "date": "2025-10-14",
+                "charge_cycles": 2,
+                "max_charge": 100,
+                "min_charge": 15,
+                "screen_on_time": 5.2,
+                "app_consumption": {
+                    "YouTube": 25,
+                    "WhatsApp": 15,
+                    "Instagram": 20,
+                    "Chrome": 10
+                }
+            },
+            {
+                "date": "2025-10-13",
+                "charge_cycles": 1,
+                "max_charge": 100,
+                "min_charge": 20,
+                "screen_on_time": 4.8,
+                "app_consumption": {
+                    "YouTube": 20,
+                    "WhatsApp": 18,
+                    "Instagram": 15,
+                    "Chrome": 12
+                }
+            }
+        ],
+        "weekly_summary": {
+            "average_cycles": 1.5,
+            "average_screen_time": 5.0,
+            "most_consuming_apps": ["YouTube", "Instagram", "WhatsApp"]
+        }
+    }
+}
