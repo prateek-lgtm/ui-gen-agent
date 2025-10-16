@@ -446,26 +446,41 @@ class ConversationMemory:
         Returns:
             List[Dict]: List of session summaries ordered by recent activity
         """
-        conn = sqlite3.connect(self.db_path)
-        cursor = conn.cursor()
+        with self._get_db_connection() as (conn, cursor):
+            cursor.execute("""
+                SELECT session_id, created_at, last_activity, message_count
+                FROM sessions
+                WHERE is_active = 1
+                ORDER BY last_activity DESC
+                LIMIT ?
+            """, (limit,))
+            
+            sessions = []
+            for row in cursor.fetchall():
+                session_id, created_at, last_activity, message_count = row
+                sessions.append({
+                    "session_id": session_id,
+                    "created_at": created_at,
+                    "last_activity": last_activity,
+                    "message_count": message_count
+                })
+            
+            return sessions    def clear_session(self, session_id: str) -> bool:
+        """
+        Mark a session as inactive (clear/disable it).
         
-        cursor.execute("""
-            SELECT session_id, created_at, last_activity, message_count
-            FROM sessions
-            WHERE is_active = 1
-            ORDER BY last_activity DESC
-            LIMIT ?
-        """, (limit,))
-        
-        sessions = []
-        for row in cursor.fetchall():
-            session_id, created_at, last_activity, message_count = row
-            sessions.append({
-                "session_id": session_id,
-                "created_at": created_at,
-                "last_activity": last_activity,
-                "message_count": message_count
-            })
-        
-        conn.close()
-        return sessions
+        Args:
+            session_id (str): Session identifier to clear
+            
+        Returns:
+            bool: True if session was found and cleared, False if not found
+        """
+        with self._get_db_connection() as (conn, cursor):
+            cursor.execute("""
+                UPDATE sessions 
+                SET is_active = 0
+                WHERE session_id = ?
+            """, (session_id,))
+            
+            conn.commit()
+            return cursor.rowcount > 0

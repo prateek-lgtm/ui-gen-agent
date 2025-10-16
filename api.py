@@ -622,23 +622,11 @@ async def clear_session_history(session_id: str):
         raise HTTPException(status_code=503, detail="Conversation memory not initialized")
     
     try:
-        # Mark session as inactive by updating the database
-        import sqlite3
-        conn = sqlite3.connect(conversation_memory.db_path)
-        cursor = conn.cursor()
+        # Use the conversation memory's clear method with proper connection handling
+        cleared = conversation_memory.clear_session(session_id)
         
-        cursor.execute("""
-            UPDATE sessions 
-            SET is_active = 0
-            WHERE session_id = ?
-        """, (session_id,))
-        
-        if cursor.rowcount == 0:
-            conn.close()
+        if not cleared:
             raise HTTPException(status_code=404, detail="Session not found")
-        
-        conn.commit()
-        conn.close()
         
         return {
             "session_id": session_id,
