@@ -1,104 +1,238 @@
-USER ACTIVITY DATA FOR VECTOR DATABASE
+# USER ACTIVITY DATA FOR VECTOR DATABASE
 
-=== WHATSAPP ACTIVITY DATA ===
+## EVENTS DATA
 
-Date: 2025-10-14
-WhatsApp Activity Summary:
-- Active time: 85 minutes
-- Messages sent: 124
-- Messages received: 156
-- Media files shared: 12
-- Most active chat: Family Group
-- Peak usage hours: 12:00 PM and 8:00 PM
-- Chat distribution: 65% group chats, 35% personal chats
-- Daily engagement: High activity with frequent messaging
+### G.O.A.T India Tour - 2025
+- **Location:** Delhi
+- **Date:** October 25, 2025
+- **Advance Payment:** ₹50
+- **Guests:** Lionel Messi
+- **Event ID:** 68f21e6182454bd7ea4e0fa8
+- **Image:** https://ecommercemedia.s3.ap-south-1.amazonaws.com/Attachments/1760699308459.mp4
 
-Date: 2025-10-13
-WhatsApp Activity Summary:
-- Active time: 92 minutes
-- Messages sent: 138
-- Messages received: 167
-- Media files shared: 8
-- Most active chat: Work Team
-- Peak usage hours: 10:00 AM and 3:00 PM
-- Chat distribution: 75% group chats, 25% personal chats
-- Daily engagement: Very high activity with work-related communications
+### Bollywood Music Festival 2025
+- **Location:** Mumbai
+- **Date:** November 5, 2025
+- **Advance Payment:** ₹100
+- **Guests:** Shreya Ghoshal, Arijit Singh
+- **Event ID:** 68f21e6182454bd7ea4e0fb1
+- **Image:** https://ecommercemedia.s3.ap-south-1.amazonaws.com/Attachments/1760699397138.mp4
 
-WhatsApp Weekly Summary:
-- Total active time: 620 minutes (10.3 hours)
-- Total messages exchanged: 1850
-- Media shared: 45 files
-- Most active groups: Family Group, Work Team
-- Usage pattern: Consistent daily usage with peak activity during work hours and evenings
+### Tech Summit 2025
+- **Location:** Bangalore
+- **Date:** December 10, 2025
+- **Advance Payment:** ₹75
+- **Guests:** Sundar Pichai, Satya Nadella
+- **Event ID:** 68f21e6182454bd7ea4e0fb2
+- **Image:** https://ecommercemedia.s3.ap-south-1.amazonaws.com/Attachments/1760699537464.mp4
 
-=== YOUTUBE ACTIVITY DATA ===
+### Art & Culture Exhibition
+- **Location:** Jaipur
+- **Date:** November 20, 2025
+- **Advance Payment:** ₹30
+- **Guests:** Raja Ravi Varma Exhibition Curator
+- **Event ID:** 68f21e6182454bd7ea4e0fb3
+- **Image:** https://ecommercemedia.s3.ap-south-1.amazonaws.com/Attachments/1760699308459.mp4
 
-Date: 2025-10-14
-YouTube Activity Summary:
-- Watch time: 120 minutes (2 hours)
-- Videos watched: 8
-- Most watched category: Technology
-- Peak usage hour: 8:00 PM
-- Category breakdown: Technology (45 min), Education (35 min), Entertainment (40 min)
-- Viewing pattern: Evening entertainment with focus on tech content
+### International Food Carnival
+- **Location:** Hyderabad
+- **Date:** October 30, 2025
+- **Advance Payment:** ₹60
+- **Guests:** Gordon Ramsay, Sanjeev Kapoor
+- **Event ID:** 68f21e6182454bd7ea4e0fb4
+- **Image:** https://ecommercemedia.s3.ap-south-1.amazonaws.com/Attachments/1760699397138.mp4
 
-Date: 2025-10-13
-YouTube Activity Summary:
-- Watch time: 90 minutes (1.5 hours)
-- Videos watched: 6
-- Most watched category: Education
-- Peak usage hour: 7:00 PM
-- Category breakdown: Education (50 min), Technology (25 min), Entertainment (15 min)
-- Viewing pattern: Educational content focus with moderate usage
+### Cricket Legends Meet 2025
+- **Location:** Kolkata
+- **Date:** December 15, 2025
+- **Advance Payment:** ₹120
+- **Guests:** Virat Kohli, MS Dhoni
+- **Event ID:** 68f21e6182454bd7ea4e0fb5
+- **Image:** https://ecommercemedia.s3.ap-south-1.amazonaws.com/Attachments/1760699537464.mp4
 
-YouTube Weekly Summary:
-- Total watch time: 840 minutes (14 hours)
-- Average daily time: 120 minutes
-- Favorite category: Technology
-- Total videos watched: 42
-- Usage pattern: Regular evening viewing with preference for technology and educational content
+## BUSINESS PLANS
 
-=== BATTERY PERFORMANCE DATA ===
+### Business Plan 200
+- **Price:** ₹200
+- **Description:** 30 GB data and 100 minutes for 28 days
+- **Data:** 30 GB
+- **Minutes:** 100
+- **Duration:** 28 days
+- **Status:** Not Active
+- **Plan ID:** 68ef9c3231f3b32ff835326a
 
-Date: 2025-10-14
-Battery Performance Summary:
-- Charge cycles: 2 full cycles
-- Battery range: 100% to 15% (85% usage)
-- Screen on time: 5.2 hours
-- Top consuming apps: YouTube (25%), Instagram (20%), WhatsApp (15%), Chrome (10%)
-- Battery health: Good performance with typical usage patterns
+### Business Plan 300
+- **Price:** ₹300
+- **Description:** 45 GB data and 150 minutes for 28 days
+- **Data:** 45 GB
+- **Minutes:** 150
+- **Duration:** 28 days
+- **Status:** Active
+- **Plan ID:** 68ef9c9931f3b32ff835326b
 
-Date: 2025-10-13
-Battery Performance Summary:
-- Charge cycles: 1 full cycle
-- Battery range: 100% to 20% (80% usage)
-- Screen on time: 4.8 hours
-- Top consuming apps: YouTube (20%), WhatsApp (18%), Instagram (15%), Chrome (12%)
-- Battery health: Excellent performance with efficient usage
+### Business Plan 500
+- **Price:** ₹500
+- **Description:** 60 GB data and 300 minutes for 28 days
+- **Data:** 60 GB
+- **Minutes:** 300
+- **Duration:** 28 days
+- **Status:** not Active
+- **Plan ID:** 68ef9ca831f3b32ff835326c
 
-Battery Weekly Summary:
-- Average charge cycles: 1.5 per day
-- Average screen time: 5.0 hours daily
-- Most consuming apps: YouTube, Instagram, WhatsApp
-- Battery health: Good overall performance with normal degradation patterns
-- Usage recommendation: Moderate to heavy usage with room for optimization
+## SOCIAL MEDIA USAGE DATA
 
-=== USER BEHAVIOR PATTERNS ===
+### April 2025 Usage
+**Date: April 1, 2025**
+- Facebook: 1.2 GB
+- Instagram: 1.8 GB
+- YouTube: 3.5 GB
+- Twitter: 0.6 GB
+- Call Minutes: 45 minutes
 
-Communication Patterns:
-- Heavy WhatsApp user with strong preference for group communications
-- Peak communication hours: 10AM-12PM and 3PM-8PM
-- Balanced between personal and professional messaging
-- High media sharing activity indicates rich communication style
+**Date: April 15, 2025**
+- Facebook: 0.9 GB
+- Instagram: 2.1 GB
+- YouTube: 4.0 GB
+- Twitter: 0.4 GB
+- Call Minutes: 60 minutes
 
-Entertainment Patterns:
-- Regular YouTube viewer with consistent daily consumption
-- Strong preference for educational and technology content
-- Evening viewing habits (7-8PM peak times)
-- Moderate to high engagement with longer viewing sessions
+### May 2025 Usage
+**Date: May 1, 2025**
+- Facebook: 1.5 GB
+- Instagram: 2.5 GB
+- YouTube: 5.2 GB
+- Twitter: 0.7 GB
+- Call Minutes: 70 minutes
 
-Device Usage Patterns:
-- Moderate to heavy smartphone user (5+ hours screen time)
-- Balanced app usage across social, entertainment, and productivity
-- Typical charging behavior with 1-2 cycles per day
-- Good battery management with reasonable charge levels
+**Date: May 15, 2025**
+- Facebook: 1.1 GB
+- Instagram: 1.9 GB
+- YouTube: 3.8 GB
+- Twitter: 0.5 GB
+- Call Minutes: 55 minutes
+
+### June 2025 Usage
+**Date: June 1, 2025**
+- Facebook: 1.8 GB
+- Instagram: 2.7 GB
+- YouTube: 6.1 GB
+- Twitter: 0.9 GB
+- Call Minutes: 80 minutes
+
+**Date: June 15, 2025**
+- Facebook: 1.3 GB
+- Instagram: 2.3 GB
+- YouTube: 4.5 GB
+- Twitter: 0.6 GB
+- Call Minutes: 65 minutes
+
+### July 2025 Usage
+**Date: July 1, 2025**
+- Facebook: 1.6 GB
+- Instagram: 3.0 GB
+- YouTube: 5.9 GB
+- Twitter: 0.8 GB
+- Call Minutes: 75 minutes
+
+**Date: July 15, 2025**
+- Facebook: 1.0 GB
+- Instagram: 2.2 GB
+- YouTube: 4.2 GB
+- Twitter: 0.5 GB
+- Call Minutes: 58 minutes
+
+### August 2025 Usage
+**Date: August 1, 2025**
+- Facebook: 2.0 GB
+- Instagram: 3.4 GB
+- YouTube: 6.7 GB
+- Twitter: 1.0 GB
+- Call Minutes: 90 minutes
+
+**Date: August 15, 2025**
+- Facebook: 1.4 GB
+- Instagram: 2.8 GB
+- YouTube: 5.0 GB
+- Twitter: 0.7 GB
+- Call Minutes: 68 minutes
+
+### September 2025 Usage
+**Date: September 1, 2025**
+- Facebook: 1.9 GB
+- Instagram: 3.1 GB
+- YouTube: 6.3 GB
+- Twitter: 0.9 GB
+- Call Minutes: 85 minutes
+
+**Date: September 15, 2025**
+- Facebook: 1.2 GB
+- Instagram: 2.4 GB
+- YouTube: 4.8 GB
+- Twitter: 0.6 GB
+- Call Minutes: 62 minutes
+
+### October 2025 Usage
+**Date: October 1, 2025**
+- Facebook: 2.1 GB
+- Instagram: 3.6 GB
+- YouTube: 7.0 GB
+- Twitter: 1.1 GB
+- Call Minutes: 95 minutes
+
+**Date: October 15, 2025**
+- Facebook: 1.7 GB
+- Instagram: 3.0 GB
+- YouTube: 5.8 GB
+- Twitter: 0.8 GB
+- Call Minutes: 72 minutes
+
+## USER PROFILE
+
+### Test User Profile
+- **Name:** Test User
+- **User ID:** 68f214520c6ed47df45ebe4e
+- **Current Plan:** Business Plan 300
+- **Data Used:** 12.5 GB
+- **Minutes Used:** 85 minutes
+
+## USER'S CURRENT PLAN
+
+### Current Plan: Business Plan 300
+- **Plan ID:** 68ef9c9931f3b32ff835326b
+- **Price:** ₹300
+- **Description:** 45 GB data and 150 minutes for 28 days
+- **Data:** 45 GB
+- **Minutes:** 150
+- **Duration:** 28 days
+- **Status:** Active
+- **Data Used:** 12.5 GB
+- **Minutes Used:** 85 minutes
+- **Remaining Data:** 32.5 GB
+- **Remaining Minutes:** 65 minutes
+- **Plan Activation Date:** October 5, 2025
+- **Plan Expiry Date:** November 2, 2025
+
+### Plan Notes
+- Business plans are available for recharge if user wants to add more data
+- User can upgrade or switch between Business Plan 200, 300, and 500
+- Current plan expires on November 2, 2025 and will need renewal
+
+## USAGE PATTERNS
+
+### Social Media Trends
+- YouTube is the most consumed platform with average 5.2 GB per month
+- Instagram usage averages 2.6 GB per month
+- Facebook usage averages 1.5 GB per month
+- Twitter has lowest usage at 0.7 GB per month
+
+### Call Usage Patterns
+- Average call minutes: 70 minutes per month
+- Peak usage in August: 90 minutes
+- Lowest usage in April: 45 minutes
+- Monthly usage trend shows increasing pattern
+
+### Data Consumption Analysis
+- Total monthly data usage: 9.0 GB average
+- Highest consumption month: October 2025 (12.5 GB)
+- Video streaming (YouTube) accounts for 58% of total usage
+- Social media combined accounts for 42% of usage
