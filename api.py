@@ -41,6 +41,7 @@ from src.analytics_agent import AnalyticsUIAgent
 from src.rag import RAGManager
 from src.conversation_memory import ConversationMemory
 from run import QueryUIPatternsTool, load_user_data
+import openai
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -224,11 +225,22 @@ class RAGChatbotAPI:
     def retrieve_context(self, query: str, n_results: int = 5) -> List[str]:
         """Retrieve relevant context using existing RAG manager"""
         try:
+            # Check if RAG manager and vector store are properly initialized
+            if not self.rag_manager:
+                logger.error("RAG manager is not initialized")
+                return []
+            
+            if not self.rag_manager.vector_store:
+                logger.error("Vector store is not initialized")
+                return []
+            
             # Use the existing RAG manager's query method
             context_chunks = self.rag_manager.query_user_data(query, k=n_results)
+            logger.info(f"Retrieved {len(context_chunks) if context_chunks else 0} context chunks for query: {query}")
+            
             return context_chunks if context_chunks else []
         except Exception as e:
-            print(f"Error retrieving context: {e}")
+            logger.error(f"Error retrieving context: {e}")
             return []
     
     def generate_response(self, query: str, context: List[str]) -> str:
@@ -271,11 +283,20 @@ Please provide a clear, helpful answer based on the context above."""
     
     def chat(self, query: str) -> str:
         """Main chat function"""
+        logger.info(f"Processing chat query: {query}")
+        
         context = self.retrieve_context(query)
         
         if not context:
-            return "I couldn't find relevant information to answer your question."
+            logger.warning(f"No context found for query: {query}")
+            # Try a broader search with more results
+            context = self.retrieve_context(query, n_results=10)
+            
+            if not context:
+                logger.error(f"Still no context found for query: {query}. Vector store may not be initialized properly.")
+                return "I couldn't find relevant information to answer your question. The knowledge base may not be properly initialized."
         
+        logger.info(f"Found {len(context)} context chunks, generating response")
         return self.generate_response(query, context)
 
 # Global variables for our initialized components
@@ -350,9 +371,27 @@ async def startup_event():
             api_key=openai_key
         )
         
+        # Check if data file exists before initializing vector store
+        data_file_path = "data/user_activity/user_data_for_vectordb.txt"
+        if not os.path.exists(data_file_path):
+            raise FileNotFoundError(f"Vector database text file not found: {data_file_path}")
+        
+        # Log file info
+        with open(data_file_path, 'r') as f:
+            content = f.read()
+            logger.info(f"Data file found: {len(content)} characters, preview: {content[:100]}...")
+        
         # Initialize vector store with user activity data
-        rag_manager.initialize_vector_store("data/user_activity/user_data_for_vectordb.txt")
-        logger.info("RAG manager initialized")
+        rag_manager.initialize_vector_store(data_file_path)
+        logger.info("RAG manager initialized successfully")
+        
+        # Verify vector store is working
+        try:
+            test_results = rag_manager.query_user_data("test query", k=1)
+            logger.info(f"Vector store test successful: {len(test_results) if test_results else 0} results")
+        except Exception as e:
+            logger.error(f"Vector store test failed: {e}")
+            raise e
         
         # Create RAG tool
         rag_tool = QueryUIPatternsTool(rag_manager=rag_manager)
@@ -760,6 +799,43 @@ async def chat_health():
     if chatbot is None:
         raise HTTPException(status_code=503, detail="Chatbot not initialized")
     return {"status": "healthy", "model": "text-embedding-3-large"}
+
+@app.get("/debug/rag")
+async def debug_rag():
+    """Debug endpoint to check RAG system status"""
+    if chatbot is None:
+        return {"error": "Chatbot not initialized"}
+    
+    debug_info = {
+        "chatbot_initialized": chatbot is not None,
+        "rag_manager_initialized": chatbot.rag_manager is not None,
+        "vector_store_initialized": chatbot.rag_manager.vector_store is not None if chatbot.rag_manager else False,
+    }
+    
+    # Try a test query
+    if chatbot.rag_manager and chatbot.rag_manager.vector_store:
+        try:
+            test_results = chatbot.rag_manager.query_user_data("test", k=1)
+            debug_info["test_query_results"] = len(test_results) if test_results else 0
+            debug_info["sample_result"] = test_results[0][:100] + "..." if test_results and test_results[0] else None
+        except Exception as e:
+            debug_info["test_query_error"] = str(e)
+    
+    # Check if data files exist
+    import os
+    debug_info["data_file_exists"] = os.path.exists("data/user_activity/user_data_for_vectordb.txt")
+    debug_info["chroma_db_exists"] = os.path.exists("chroma_db")
+    
+    if debug_info["data_file_exists"]:
+        try:
+            with open("data/user_activity/user_data_for_vectordb.txt", 'r') as f:
+                content = f.read()
+                debug_info["data_file_size"] = len(content)
+                debug_info["data_file_preview"] = content[:200] + "..." if content else "Empty file"
+        except Exception as e:
+            debug_info["data_file_read_error"] = str(e)
+    
+    return debug_info
 
 @app.post("/chat", response_model=QueryResponse)
 async def chat_endpoint(request: QueryRequest):
