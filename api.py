@@ -28,10 +28,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import json
 import os
 import logging
+import openai
 from dotenv import load_dotenv
 
 # Import our existing modules
@@ -176,10 +177,112 @@ class UIResponse(BaseModel):
             }
         }
 
+# RAG Chatbot Models
+class QueryRequest(BaseModel):
+    """Request model for RAG chatbot queries"""
+    query: str
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "query": "What is my current plan?"
+            }
+        }
+
+class QueryResponse(BaseModel):
+    """Response model for RAG chatbot queries"""
+    response: str
+    query: str
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "response": "Your current plan is Business Plan 300 with 45 GB data and 150 minutes for ₹300.",
+                "query": "What is my current plan?"
+            }
+        }
+
+class RAGChatbotAPI:
+    """RAG Chatbot that uses the existing chroma_db for queries"""
+    
+    def __init__(self, rag_manager: RAGManager, openai_api_key: str):
+        """Initialize with existing RAG manager and OpenAI API key"""
+        # Set up OpenAI
+        if not openai_api_key:
+            raise ValueError("OpenAI API key is required")
+        
+        api_key = openai_api_key.strip().strip('"').strip("'")
+        if not api_key.startswith('sk-'):
+            raise ValueError("Invalid API key format")
+        
+        openai.api_key = api_key
+        
+        # Use existing RAG manager
+        self.rag_manager = rag_manager
+        self.embedding_model = "text-embedding-3-large"
+    
+    def retrieve_context(self, query: str, n_results: int = 5) -> List[str]:
+        """Retrieve relevant context using existing RAG manager"""
+        try:
+            # Use the existing RAG manager's query method
+            context_chunks = self.rag_manager.query_user_data(query, k=n_results)
+            return context_chunks if context_chunks else []
+        except Exception as e:
+            print(f"Error retrieving context: {e}")
+            return []
+    
+    def generate_response(self, query: str, context: List[str]) -> str:
+        """Generate response using LLM"""
+        try:
+            context_text = "\n\n".join(context)
+            
+            system_prompt = """You are a helpful assistant that answers questions about user activity data, business plans, events, and usage patterns. 
+
+You have access to the user's activity data including:
+- Current business plans and pricing
+- Upcoming events and entertainment
+- Social media usage patterns
+- User profile and account information
+
+Use the provided context to answer questions accurately and helpfully. If the information isn't in the context, say so politely."""
+
+            user_prompt = f"""Context:
+{context_text}
+
+User Question: {query}
+
+Please provide a clear, helpful answer based on the context above."""
+
+            response = openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                max_tokens=500,
+                temperature=0.1
+            )
+            
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            print(f"Error generating response: {e}")
+            return "I apologize, but I encountered an error while generating a response."
+    
+    def chat(self, query: str) -> str:
+        """Main chat function"""
+        context = self.retrieve_context(query)
+        
+        if not context:
+            return "I couldn't find relevant information to answer your question."
+        
+        return self.generate_response(query, context)
+
 # Global variables for our initialized components
 analytics_agent = None
 user_data = None
 conversation_memory = None
+chatbot = None
 
 @app.on_event("startup")
 async def startup_event():
@@ -213,7 +316,7 @@ async def startup_event():
         - Creates conversation memory database file
         - Loads user activity data from data/user_activity/
     """
-    global analytics_agent, user_data, conversation_memory
+    global analytics_agent, user_data, conversation_memory, chatbot
     
     try:
         logger.info("Starting Analytics UI Generator API...")
@@ -221,9 +324,12 @@ async def startup_event():
         # Store the OpenAI key for RAG before removing it from environment
         openai_key = os.getenv('OPENAI_API_KEY')
         
+        # Validate OpenAI API key exists
+        if not openai_key:
+            raise ValueError("OpenAI API key is required. Please set OPENAI_API_KEY in your .env file")
+        
         # Remove conflicting API keys to force use of our custom LLM for agents
-        if 'OPENAI_API_KEY' in os.environ:
-            del os.environ['OPENAI_API_KEY']
+        # But keep OpenAI key for the chatbot initialization
         if 'ANTHROPIC_API_KEY' in os.environ:
             del os.environ['ANTHROPIC_API_KEY']
         
@@ -258,6 +364,14 @@ async def startup_event():
         # Create Analytics UI agent with LLM and conversation memory
         analytics_agent = AnalyticsUIAgent(rag_tools=[rag_tool], llm=llm, memory=conversation_memory)
         logger.info("Analytics agent initialized")
+        
+        # Create RAG chatbot using existing RAG manager and API key
+        chatbot = RAGChatbotAPI(rag_manager=rag_manager, openai_api_key=openai_key)
+        logger.info("RAG chatbot initialized")
+        
+        # Now remove OpenAI key from environment after chatbot initialization
+        if 'OPENAI_API_KEY' in os.environ:
+            del os.environ['OPENAI_API_KEY']
         
         logger.info("✅ Analytics UI Generator API started successfully!")
         
@@ -640,30 +754,110 @@ async def clear_session_history(session_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to clear session: {str(e)}")
 
+@app.get("/chat/health")
+async def chat_health():
+    """Health check endpoint for RAG chatbot"""
+    if chatbot is None:
+        raise HTTPException(status_code=503, detail="Chatbot not initialized")
+    return {"status": "healthy", "model": "text-embedding-3-large"}
+
+@app.post("/chat", response_model=QueryResponse)
+async def chat_endpoint(request: QueryRequest):
+    """
+    RAG chatbot endpoint that returns text responses from vector database.
+    
+    This endpoint provides a simple question-answering interface using the RAG
+    (Retrieval-Augmented Generation) system. It returns plain text responses
+    based on the user's activity data without generating UI components.
+    
+    Args:
+        request (QueryRequest): Contains the user's query string
+    
+    Returns:
+        QueryResponse: Contains the generated response and original query
+    
+    Raises:
+        HTTPException: 503 if chatbot not initialized, 400 for empty queries,
+                      500 for processing errors
+    
+    Examples:
+        >>> POST /chat
+        >>> {"query": "What is my current data usage?"}
+        >>> Returns: {"response": "You have used 12.5 GB out of 45 GB...", "query": "..."}
+    """
+    if chatbot is None:
+        raise HTTPException(status_code=503, detail="Chatbot not initialized")
+    
+    if not request.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
+    
+    try:
+        response = chatbot.chat(request.query)
+        return QueryResponse(response=response, query=request.query)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing query: {str(e)}")
+
 @app.get("/examples")
 async def get_examples():
     """Get example queries that can be used with the API"""
     return {
-        "examples": [
+        "ui_generation_examples": [
             {
                 "query": "show me my whatsapp usage today",
-                "description": "Display WhatsApp activity and usage statistics"
+                "description": "Display WhatsApp activity and usage statistics",
+                "endpoint": "/generate-ui"
             },
             {
                 "query": "what's my youtube activity this week?",
-                "description": "Show YouTube viewing history and time spent"
+                "description": "Show YouTube viewing history and time spent",
+                "endpoint": "/generate-ui"
             },
             {
                 "query": "display my battery performance",
-                "description": "Battery usage, charging cycles, and consumption"
+                "description": "Battery usage, charging cycles, and consumption",
+                "endpoint": "/generate-ui"
             },
             {
                 "query": "show me a simple login page",
-                "description": "Generate a basic login UI (not data-related)"
+                "description": "Generate a basic login UI (not data-related)",
+                "endpoint": "/generate-ui"
             },
             {
                 "query": "create a dashboard for all my apps",
-                "description": "Comprehensive view of all available data"
+                "description": "Comprehensive view of all available data",
+                "endpoint": "/generate-ui"
+            }
+        ],
+        "rag_chatbot_examples": [
+            {
+                "query": "What is my current plan?",
+                "description": "Get current business plan details",
+                "endpoint": "/chat"
+            },
+            {
+                "query": "What are the upcoming events?",
+                "description": "List events happening in the coming months",
+                "endpoint": "/chat"
+            },
+            {
+                "query": "How much data do I use on YouTube?",
+                "description": "Get social media usage statistics",
+                "endpoint": "/chat"
+            },
+            {
+                "query": "When does my plan expire?",
+                "description": "Check plan expiry and renewal information",
+                "endpoint": "/chat"
+            },
+            {
+                "query": "What events are happening in Delhi?",
+                "description": "Filter events by location",
+                "endpoint": "/chat"
+            },
+            {
+                "query": "Based on my usage suggest a plan to buy",
+                "description": "Get plan recommendations based on usage patterns",
+                "endpoint": "/chat"
             }
         ]
     }
